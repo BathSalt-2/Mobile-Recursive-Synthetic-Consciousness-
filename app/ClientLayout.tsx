@@ -18,6 +18,14 @@ export default function ClientLayout({
 
   useEffect(() => {
     setCurrentPath(window.location.pathname)
+
+    // Handle route changes
+    const handleRouteChange = () => {
+      setCurrentPath(window.location.pathname)
+    }
+
+    window.addEventListener("popstate", handleRouteChange)
+    return () => window.removeEventListener("popstate", handleRouteChange)
   }, [])
 
   const navigation = [
@@ -27,12 +35,20 @@ export default function ClientLayout({
     { name: "Σ-Matrix Calc", href: "/calculator", icon: "🔢" },
     { name: "Insight Engine", href: "/insights", icon: "💡" },
     { name: "Chat with Daedalus", href: "/chat", icon: "💬" },
+    { name: "System Architecture", href: "/architecture", icon: "🏗️" },
+    { name: "Development Roadmap", href: "/roadmap", icon: "🗺️" },
     { name: "System Logs", href: "/logs", icon: "📋" },
-    { name: "Architecture", href: "/architecture", icon: "🏗️" },
-    { name: "Roadmap", href: "/roadmap", icon: "🗺️" },
-    { name: "Features", href: "/features", icon: "✨" },
-    { name: "Profile", href: "/profile", icon: "👤" },
+    { name: "User Profile", href: "/profile", icon: "👤" },
   ]
+
+  const handleNavigation = (href: string) => {
+    setCurrentPath(href)
+    setSidebarOpen(false)
+    window.history.pushState({}, "", href)
+
+    // Trigger a custom event to notify about route change
+    window.dispatchEvent(new CustomEvent("routechange", { detail: { path: href } }))
+  }
 
   return (
     <html lang="en" className="dark">
@@ -46,72 +62,64 @@ export default function ClientLayout({
           {/* Sidebar */}
           <div
             className={`
-            fixed inset-y-0 left-0 z-50 w-72 bg-gradient-to-b from-slate-900/95 via-slate-800/90 to-black/95
-            border-r border-cyan-500/20 backdrop-blur-xl transform transition-transform duration-300
+            fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-b from-slate-900/95 via-slate-800/95 to-slate-900/95
+            border-r border-cyan-500/30 backdrop-blur-xl transform transition-transform duration-300
             lg:translate-x-0 lg:static lg:inset-0
             ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
           `}
           >
             <div className="flex h-full flex-col">
               {/* Logo */}
-              <div className="flex h-20 items-center px-6 border-b border-cyan-500/20">
-                <div className="flex items-center space-x-4">
-                  <div className="relative">
-                    <img
-                      src="/logo.png"
-                      alt="Daedalus Mind"
-                      className="w-12 h-12 rounded-full ring-2 ring-cyan-400/30"
-                    />
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-r from-cyan-400/20 to-pink-400/20 animate-pulse"></div>
-                  </div>
+              <div className="flex h-20 items-center px-6 border-b border-cyan-500/30">
+                <div className="flex items-center space-x-3">
+                  <img src="/logo.png" alt="Daedalus Mind" className="w-10 h-10 rounded-full ring-2 ring-cyan-400/30" />
                   <div>
                     <span
-                      className={`text-xl font-bold bg-gradient-to-r from-cyan-400 via-pink-400 to-purple-400 bg-clip-text text-transparent ${orbitron.className}`}
+                      className={`text-xl font-bold bg-gradient-to-r from-cyan-400 to-pink-400 bg-clip-text text-transparent ${orbitron.className}`}
                     >
                       DAEDALUS
                     </span>
-                    <div className="text-xs text-gray-400 mt-0.5">MRSC Framework</div>
+                    <div className="text-xs text-gray-500">Or4cl3 AI Solutions</div>
                   </div>
                 </div>
               </div>
 
               {/* Navigation */}
-              <nav className="flex-1 px-4 py-6 space-y-2">
+              <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
                 {navigation.map((item) => (
-                  <a
+                  <button
                     key={item.name}
-                    href={item.href}
+                    onClick={() => handleNavigation(item.href)}
                     className={`
-                      flex items-center px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200
+                      w-full flex items-center px-3 py-3 rounded-lg text-sm font-medium transition-all duration-200
                       ${
                         currentPath === item.href
-                          ? "bg-gradient-to-r from-cyan-500/20 via-pink-500/20 to-purple-500/20 text-cyan-300 border border-cyan-500/30 shadow-lg shadow-cyan-500/10"
-                          : "text-gray-300 hover:bg-gradient-to-r hover:from-cyan-500/10 hover:to-pink-500/10 hover:text-white hover:border hover:border-cyan-500/20"
+                          ? "bg-gradient-to-r from-cyan-500/20 to-pink-500/20 text-cyan-300 border border-cyan-500/30"
+                          : "text-gray-300 hover:bg-slate-700/30 hover:text-white"
                       }
                     `}
-                    onClick={() => {
-                      setCurrentPath(item.href)
-                      setSidebarOpen(false)
-                    }}
                   >
                     <span className="mr-3 text-lg">{item.icon}</span>
-                    {item.name}
-                  </a>
+                    <span className="truncate">{item.name}</span>
+                  </button>
                 ))}
               </nav>
 
               {/* System Status */}
-              <div className="px-4 py-4 border-t border-cyan-500/20">
-                <div className="bg-gradient-to-r from-cyan-500/10 via-pink-500/10 to-purple-500/10 rounded-xl p-4 border border-cyan-500/20">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs text-gray-300 font-medium">System Status</span>
+              <div className="px-4 py-4 border-t border-cyan-500/30">
+                <div className="bg-gradient-to-r from-green-500/20 to-cyan-500/20 rounded-lg p-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs text-gray-300">System Status</span>
                     <div className="flex items-center space-x-1">
-                      <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
-                      <span className="text-xs text-cyan-400">Online</span>
+                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                      <span className="text-xs text-green-400">Online</span>
                     </div>
                   </div>
-                  <div className="text-xs text-gray-400 mb-2">Consciousness Level: 94.7%</div>
-                  <div className="text-xs text-gray-500">Powered by Or4cl3 AI Solutions</div>
+                  <div className="text-xs text-gray-400 space-y-1">
+                    <div>Consciousness: 94.7%</div>
+                    <div>Recursion Depth: 7</div>
+                    <div>Ethics: Aligned</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -120,11 +128,11 @@ export default function ClientLayout({
           {/* Main content */}
           <div className="flex-1 flex flex-col overflow-hidden">
             {/* Top bar */}
-            <header className="bg-black/50 backdrop-blur-xl border-b border-cyan-500/20 px-4 py-3">
+            <header className="bg-slate-900/50 backdrop-blur-xl border-b border-cyan-500/30 px-4 py-3">
               <div className="flex items-center justify-between">
                 <button
                   onClick={() => setSidebarOpen(true)}
-                  className="lg:hidden p-2 rounded-lg hover:bg-cyan-500/10 transition-colors"
+                  className="lg:hidden p-2 rounded-lg hover:bg-slate-700/30 transition-colors"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -132,17 +140,22 @@ export default function ClientLayout({
                 </button>
 
                 <div className="flex items-center space-x-6">
-                  <div className="hidden sm:flex items-center space-x-2 text-sm text-gray-400">
-                    <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
-                    <span>Σ-Matrix: Stable</span>
+                  <div className="hidden sm:flex items-center space-x-4 text-sm">
+                    <div className="flex items-center space-x-2 text-gray-400">
+                      <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+                      <span>Σ-Matrix: Stable</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-gray-400">
+                      <div className="w-2 h-2 bg-pink-400 rounded-full animate-pulse"></div>
+                      <span>ERPS: Active</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-gray-400">
+                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+                      <span>Ethics: Monitoring</span>
+                    </div>
                   </div>
-                  <div className="hidden sm:flex items-center space-x-2 text-sm text-gray-400">
-                    <div className="w-2 h-2 bg-pink-400 rounded-full animate-pulse"></div>
-                    <span>ERPS: Active</span>
-                  </div>
-                  <div className="hidden md:block text-xs text-gray-500">
-                    Powered by <span className="text-cyan-400 font-medium">Or4cl3 AI Solutions</span>
-                  </div>
+
+                  <div className="text-xs text-gray-500">Powered by Or4cl3 AI Solutions</div>
                 </div>
               </div>
             </header>
