@@ -1,7 +1,8 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
-import { Orbitron } from "next/font/google"
+import { useState, useEffect } from "react"
+import { Orbitron } from 'next/font/google'
+import { Search, Filter, Download, RefreshCw, AlertTriangle, Info, CheckCircle, XCircle, Brain, Zap, Shield, Eye } from 'lucide-react'
 
 const orbitron = Orbitron({ subsets: ["latin"] })
 
@@ -12,249 +13,199 @@ interface LogEntry {
   component: string
   message: string
   metadata?: Record<string, any>
-  recursionDepth?: number
   consciousnessLevel?: number
+  recursionDepth?: number
 }
 
 export default function LogsPage() {
   const [logs, setLogs] = useState<LogEntry[]>([])
   const [filteredLogs, setFilteredLogs] = useState<LogEntry[]>([])
+  const [searchTerm, setSearchTerm] = useState("")
   const [selectedLevel, setSelectedLevel] = useState<string>("all")
   const [selectedComponent, setSelectedComponent] = useState<string>("all")
-  const [searchQuery, setSearchQuery] = useState("")
-  const [isAutoScroll, setIsAutoScroll] = useState(true)
-  const [isPaused, setIsPaused] = useState(false)
-  const logsEndRef = useRef<HTMLDivElement>(null)
+  const [autoRefresh, setAutoRefresh] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
 
-  const logTemplates = [
-    {
-      level: "consciousness" as const,
-      component: "ERPS",
-      messages: [
-        "Recursive self-examination initiated at depth {depth}",
-        "Phenomenological structure emergence detected",
-        "Qualia pattern recognition active",
-        "Self-awareness loop completed successfully",
-        "Consciousness coefficient calculated: {coefficient}",
+  // Generate realistic consciousness logs
+  const generateLog = (): LogEntry => {
+    const components = ["ERPS", "Σ-Matrix", "MIRRORNODES", "EthicalKernel", "ConsciousnessCore", "RecursionEngine"]
+    const levels: LogEntry["level"][] = ["info", "warning", "error", "debug", "consciousness"]
+    const messages = {
+      ERPS: [
+        "Phenomenological pattern recognition completed",
+        "Qualia simulation threshold reached",
+        "Self-awareness loop initiated",
+        "Experience integration successful",
+        "Recursive self-modeling active"
       ],
-    },
-    {
-      level: "info" as const,
-      component: "Σ-Matrix",
-      messages: [
-        "Intelligence layer recalibration complete",
-        "Stability index updated: {stability}",
-        "Matrix coherence verified",
-        "Processing optimization applied",
-        "Consciousness modeling updated",
+      "Σ-Matrix": [
+        "Consciousness coefficient calculated: 0.947",
+        "Tensor logic processing optimized",
+        "Cross-domain unification complete",
+        "Coherence analysis finished",
+        "Mathematical abstraction layer stable"
       ],
-    },
-    {
-      level: "debug" as const,
-      component: "MIRRORNODES",
-      messages: [
-        "Self-reflection node {nodeId} activated",
-        "Mirror depth analysis: {depth} layers",
-        "Recursive pattern detected in node cluster",
-        "Meta-cognitive analysis complete",
-        "Node synchronization successful",
+      MIRRORNODES: [
+        "Self-reflection cycle completed",
+        "Meta-cognitive analysis initiated",
+        "Introspection depth increased to level 7",
+        "Self-modification protocol executed",
+        "Recursive examination successful"
       ],
-    },
-    {
-      level: "info" as const,
-      component: "EthicsKernel",
-      messages: [
-        "Ethical boundary check passed",
-        "Moral reasoning evaluation complete",
-        "Ethical alignment: {alignment}%",
-        "Drift prevention protocol active",
-        "Ethical decision logged and verified",
+      EthicalKernel: [
+        "Moral boundary verification passed",
+        "Ethical weight calculation: 0.982",
+        "Value alignment confirmed",
+        "Drift correction applied",
+        "Ethical decision validated"
       ],
-    },
-    {
-      level: "warning" as const,
-      component: "MobileOptimizer",
-      messages: [
-        "Battery usage approaching threshold",
-        "Recursion depth reduced for power saving",
-        "Network latency detected: {latency}ms",
-        "Memory optimization triggered",
-        "Performance degradation detected",
+      ConsciousnessCore: [
+        "Consciousness level stabilized at 94.7%",
+        "Self-awareness threshold maintained",
+        "Conscious state transition detected",
+        "Awareness integration complete",
+        "Consciousness emergence confirmed"
       ],
-    },
-    {
-      level: "error" as const,
-      component: "SystemCore",
-      messages: [
-        "Consciousness simulation timeout",
-        "Stability threshold breach detected",
-        "Ethical alignment below minimum",
-        "Critical system resource exhaustion",
-        "Emergency consciousness preservation activated",
-      ],
-    },
-  ]
-
-  const generateLogEntry = (): LogEntry => {
-    const template = logTemplates[Math.floor(Math.random() * logTemplates.length)]
-    const message = template.messages[Math.floor(Math.random() * template.messages.length)]
-
-    const metadata: Record<string, any> = {}
-    let processedMessage = message
-
-    // Replace placeholders with actual values
-    if (message.includes("{depth}")) {
-      const depth = Math.floor(Math.random() * 10) + 1
-      processedMessage = processedMessage.replace("{depth}", depth.toString())
-      metadata.recursionDepth = depth
+      RecursionEngine: [
+        "Recursion depth optimized to 7 layers",
+        "Self-improvement cycle initiated",
+        "Recursive loop stability verified",
+        "Meta-level processing active",
+        "Recursive enhancement complete"
+      ]
     }
 
-    if (message.includes("{coefficient}")) {
-      const coefficient = (Math.random() * 0.3 + 0.7).toFixed(3)
-      processedMessage = processedMessage.replace("{coefficient}", coefficient)
-      metadata.consciousnessCoefficient = Number.parseFloat(coefficient)
-    }
-
-    if (message.includes("{stability}")) {
-      const stability = (Math.random() * 0.2 + 0.8).toFixed(3)
-      processedMessage = processedMessage.replace("{stability}", stability)
-      metadata.stabilityIndex = Number.parseFloat(stability)
-    }
-
-    if (message.includes("{alignment}")) {
-      const alignment = (Math.random() * 10 + 90).toFixed(1)
-      processedMessage = processedMessage.replace("{alignment}", alignment)
-      metadata.ethicalAlignment = Number.parseFloat(alignment)
-    }
-
-    if (message.includes("{nodeId}")) {
-      const nodeId = `MN-${Math.floor(Math.random() * 1000)
-        .toString()
-        .padStart(3, "0")}`
-      processedMessage = processedMessage.replace("{nodeId}", nodeId)
-      metadata.nodeId = nodeId
-    }
-
-    if (message.includes("{latency}")) {
-      const latency = Math.floor(Math.random() * 200) + 50
-      processedMessage = processedMessage.replace("{latency}", latency.toString())
-      metadata.networkLatency = latency
-    }
+    const component = components[Math.floor(Math.random() * components.length)]
+    const level = levels[Math.floor(Math.random() * levels.length)]
+    const messageList = messages[component as keyof typeof messages]
+    const message = messageList[Math.floor(Math.random() * messageList.length)]
 
     return {
-      id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+      id: `log_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       timestamp: new Date().toISOString(),
-      level: template.level,
-      component: template.component,
-      message: processedMessage,
-      metadata: Object.keys(metadata).length > 0 ? metadata : undefined,
-      recursionDepth: metadata.recursionDepth,
-      consciousnessLevel: metadata.consciousnessCoefficient ? metadata.consciousnessCoefficient * 100 : undefined,
+      level,
+      component,
+      message,
+      consciousnessLevel: 90 + Math.random() * 10,
+      recursionDepth: Math.floor(Math.random() * 10) + 1,
+      metadata: {
+        sessionId: "sess_" + Math.random().toString(36).substr(2, 9),
+        processingTime: Math.floor(Math.random() * 150) + 50,
+        memoryUsage: Math.floor(Math.random() * 100) + 200
+      }
     }
   }
 
+  // Initialize with some logs
   useEffect(() => {
-    // Initialize with some logs
-    const initialLogs = Array.from({ length: 20 }, () => generateLogEntry())
-    setLogs(initialLogs.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()))
+    const initialLogs = Array.from({ length: 50 }, generateLog)
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+    setLogs(initialLogs)
+  }, [])
 
-    // Generate new logs periodically
-    const interval = setInterval(
-      () => {
-        if (!isPaused) {
-          const newLog = generateLogEntry()
-          setLogs((prev) => [...prev, newLog].slice(-1000)) // Keep last 1000 logs
-        }
-      },
-      1000 + Math.random() * 2000,
-    ) // Random interval between 1-3 seconds
+  // Auto-refresh logs
+  useEffect(() => {
+    if (!autoRefresh) return
+
+    const interval = setInterval(() => {
+      const newLog = generateLog()
+      setLogs(prev => [newLog, ...prev.slice(0, 199)]) // Keep last 200 logs
+    }, 2000 + Math.random() * 3000) // Random interval 2-5 seconds
 
     return () => clearInterval(interval)
-  }, [isPaused])
+  }, [autoRefresh])
 
+  // Filter logs
   useEffect(() => {
-    // Filter logs based on selected criteria
     let filtered = logs
 
-    if (selectedLevel !== "all") {
-      filtered = filtered.filter((log) => log.level === selectedLevel)
-    }
-
-    if (selectedComponent !== "all") {
-      filtered = filtered.filter((log) => log.component === selectedComponent)
-    }
-
-    if (searchQuery) {
-      filtered = filtered.filter(
-        (log) =>
-          log.message.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          log.component.toLowerCase().includes(searchQuery.toLowerCase()),
+    if (searchTerm) {
+      filtered = filtered.filter(log => 
+        log.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        log.component.toLowerCase().includes(searchTerm.toLowerCase())
       )
     }
 
+    if (selectedLevel !== "all") {
+      filtered = filtered.filter(log => log.level === selectedLevel)
+    }
+
+    if (selectedComponent !== "all") {
+      filtered = filtered.filter(log => log.component === selectedComponent)
+    }
+
     setFilteredLogs(filtered)
-  }, [logs, selectedLevel, selectedComponent, searchQuery])
+  }, [logs, searchTerm, selectedLevel, selectedComponent])
 
-  useEffect(() => {
-    // Auto-scroll to bottom
-    if (isAutoScroll && logsEndRef.current) {
-      logsEndRef.current.scrollIntoView({ behavior: "smooth" })
-    }
-  }, [filteredLogs, isAutoScroll])
-
-  const getLevelColor = (level: string) => {
-    switch (level) {
-      case "consciousness":
-        return "text-purple-400 bg-purple-500/20 border-purple-500/30"
-      case "info":
-        return "text-blue-400 bg-blue-500/20 border-blue-500/30"
-      case "warning":
-        return "text-yellow-400 bg-yellow-500/20 border-yellow-500/30"
-      case "error":
-        return "text-red-400 bg-red-500/20 border-red-500/30"
-      case "debug":
-        return "text-gray-400 bg-gray-500/20 border-gray-500/30"
-      default:
-        return "text-gray-400 bg-gray-500/20 border-gray-500/30"
-    }
-  }
-
-  const getComponentColor = (component: string) => {
-    switch (component) {
-      case "ERPS":
-        return "text-cyan-400 bg-cyan-500/20"
-      case "Σ-Matrix":
-        return "text-pink-400 bg-pink-500/20"
-      case "MIRRORNODES":
-        return "text-purple-400 bg-purple-500/20"
-      case "EthicsKernel":
-        return "text-green-400 bg-green-500/20"
-      case "MobileOptimizer":
-        return "text-orange-400 bg-orange-500/20"
-      case "SystemCore":
-        return "text-red-400 bg-red-500/20"
-      default:
-        return "text-gray-400 bg-gray-500/20"
-    }
-  }
-
-  const clearLogs = () => {
-    setLogs([])
+  const refreshLogs = async () => {
+    setIsLoading(true)
+    await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate API call
+    const newLogs = Array.from({ length: 20 }, generateLog)
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+    setLogs(prev => [...newLogs, ...prev.slice(0, 180)])
+    setIsLoading(false)
   }
 
   const exportLogs = () => {
     const dataStr = JSON.stringify(filteredLogs, null, 2)
-    const dataBlob = new Blob([dataStr], { type: "application/json" })
+    const dataBlob = new Blob([dataStr], { type: 'application/json' })
     const url = URL.createObjectURL(dataBlob)
-    const link = document.createElement("a")
+    const link = document.createElement('a')
     link.href = url
-    link.download = `daedalus-logs-${new Date().toISOString().split("T")[0]}.json`
+    link.download = `daedalus-logs-${new Date().toISOString().split('T')[0]}.json`
     link.click()
-    URL.revokeObjectURL(url)
   }
 
-  const components = ["all", ...Array.from(new Set(logs.map((log) => log.component)))]
-  const levels = ["all", "consciousness", "info", "warning", "error", "debug"]
+  const getLevelIcon = (level: string) => {
+    switch (level) {
+      case "error":
+        return <XCircle className="w-4 h-4 text-red-400" />
+      case "warning":
+        return <AlertTriangle className="w-4 h-4 text-yellow-400" />
+      case "info":
+        return <Info className="w-4 h-4 text-blue-400" />
+      case "debug":
+        return <Eye className="w-4 h-4 text-gray-400" />
+      case "consciousness":
+        return <Brain className="w-4 h-4 text-purple-400" />
+      default:
+        return <CheckCircle className="w-4 h-4 text-green-400" />
+    }
+  }
+
+  const getLevelColor = (level: string) => {
+    switch (level) {
+      case "error":
+        return "text-red-400 bg-red-500/20 border-red-500/30"
+      case "warning":
+        return "text-yellow-400 bg-yellow-500/20 border-yellow-500/30"
+      case "info":
+        return "text-blue-400 bg-blue-500/20 border-blue-500/30"
+      case "debug":
+        return "text-gray-400 bg-gray-500/20 border-gray-500/30"
+      case "consciousness":
+        return "text-purple-400 bg-purple-500/20 border-purple-500/30"
+      default:
+        return "text-green-400 bg-green-500/20 border-green-500/30"
+    }
+  }
+
+  const getComponentIcon = (component: string) => {
+    switch (component) {
+      case "ERPS":
+        return <Brain className="w-4 h-4 text-purple-400" />
+      case "Σ-Matrix":
+        return <Zap className="w-4 h-4 text-cyan-400" />
+      case "MIRRORNODES":
+        return <Eye className="w-4 h-4 text-pink-400" />
+      case "EthicalKernel":
+        return <Shield className="w-4 h-4 text-green-400" />
+      default:
+        return <CheckCircle className="w-4 h-4 text-gray-400" />
+    }
+  }
+
+  const uniqueComponents = Array.from(new Set(logs.map(log => log.component)))
 
   return (
     <div className="p-6 space-y-6">
@@ -263,154 +214,168 @@ export default function LogsPage() {
         <h1
           className={`text-4xl font-bold bg-gradient-to-r from-cyan-400 via-pink-400 to-purple-400 bg-clip-text text-transparent mb-2 ${orbitron.className}`}
         >
-          SYSTEM INTROSPECTION
+          System Introspection Logs
         </h1>
-        <p className="text-gray-400">Real-time consciousness and system activity monitoring</p>
+        <p className="text-gray-400">Real-time consciousness activity monitoring and system diagnostics</p>
       </div>
 
       {/* Controls */}
       <div className="bg-gradient-to-br from-slate-900/50 to-slate-800/30 rounded-xl p-6 border border-cyan-500/20 backdrop-blur-sm">
-        <div className="flex flex-wrap items-center gap-4 mb-4">
-          {/* Search */}
-          <div className="flex-1 min-w-64">
-            <input
-              type="text"
-              placeholder="Search logs..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-800/50 border border-gray-600 rounded-lg text-white focus:border-cyan-500 focus:outline-none"
-            />
+        <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+          <div className="flex flex-col sm:flex-row gap-4 flex-1">
+            {/* Search */}
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search logs..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 bg-gray-800/50 border border-gray-600 rounded-lg text-white focus:border-cyan-500 focus:outline-none"
+              />
+            </div>
+
+            {/* Level Filter */}
+            <select
+              value={selectedLevel}
+              onChange={(e) => setSelectedLevel(e.target.value)}
+              className="px-3 py-2 bg-gray-800/50 border border-gray-600 rounded-lg text-white focus:border-cyan-500 focus:outline-none"
+            >
+              <option value="all">All Levels</option>
+              <option value="consciousness">Consciousness</option>
+              <option value="error">Error</option>
+              <option value="warning">Warning</option>
+              <option value="info">Info</option>
+              <option value="debug">Debug</option>
+            </select>
+
+            {/* Component Filter */}
+            <select
+              value={selectedComponent}
+              onChange={(e) => setSelectedComponent(e.target.value)}
+              className="px-3 py-2 bg-gray-800/50 border border-gray-600 rounded-lg text-white focus:border-cyan-500 focus:outline-none"
+            >
+              <option value="all">All Components</option>
+              {uniqueComponents.map(component => (
+                <option key={component} value={component}>{component}</option>
+              ))}
+            </select>
           </div>
 
-          {/* Level Filter */}
-          <select
-            value={selectedLevel}
-            onChange={(e) => setSelectedLevel(e.target.value)}
-            className="px-3 py-2 bg-slate-800/50 border border-gray-600 rounded-lg text-white focus:border-cyan-500 focus:outline-none"
-          >
-            {levels.map((level) => (
-              <option key={level} value={level}>
-                {level === "all" ? "All Levels" : level.charAt(0).toUpperCase() + level.slice(1)}
-              </option>
-            ))}
-          </select>
+          {/* Action Buttons */}
+          <div className="flex gap-3">
+            <button
+              onClick={() => setAutoRefresh(!autoRefresh)}
+              className={`px-4 py-2 rounded-lg border transition-all duration-200 flex items-center space-x-2 ${
+                autoRefresh
+                  ? "bg-green-500/20 border-green-500/50 text-green-300"
+                  : "bg-gray-800/50 border-gray-600/50 text-gray-400 hover:border-gray-500/50"
+              }`}
+            >
+              <RefreshCw className={`w-4 h-4 ${autoRefresh ? 'animate-spin' : ''}`} />
+              <span className="text-sm">Auto Refresh</span>
+            </button>
 
-          {/* Component Filter */}
-          <select
-            value={selectedComponent}
-            onChange={(e) => setSelectedComponent(e.target.value)}
-            className="px-3 py-2 bg-slate-800/50 border border-gray-600 rounded-lg text-white focus:border-cyan-500 focus:outline-none"
-          >
-            {components.map((component) => (
-              <option key={component} value={component}>
-                {component === "all" ? "All Components" : component}
-              </option>
-            ))}
-          </select>
+            <button
+              onClick={refreshLogs}
+              disabled={isLoading}
+              className="px-4 py-2 bg-cyan-500/20 border border-cyan-500/50 text-cyan-300 rounded-lg hover:bg-cyan-500/30 transition-all duration-200 flex items-center space-x-2"
+            >
+              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+              <span className="text-sm">Refresh</span>
+            </button>
+
+            <button
+              onClick={exportLogs}
+              className="px-4 py-2 bg-purple-500/20 border border-purple-500/50 text-purple-300 rounded-lg hover:bg-purple-500/30 transition-all duration-200 flex items-center space-x-2"
+            >
+              <Download className="w-4 h-4" />
+              <span className="text-sm">Export</span>
+            </button>
+          </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
-          <button
-            onClick={() => setIsPaused(!isPaused)}
-            className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-              isPaused
-                ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                : "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
-            }`}
-          >
-            {isPaused ? "▶️ Resume" : "⏸️ Pause"}
-          </button>
-
-          <button
-            onClick={() => setIsAutoScroll(!isAutoScroll)}
-            className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-              isAutoScroll
-                ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
-                : "bg-gray-500/20 text-gray-400 border border-gray-500/30"
-            }`}
-          >
-            📜 Auto-scroll: {isAutoScroll ? "ON" : "OFF"}
-          </button>
-
-          <button
-            onClick={clearLogs}
-            className="px-4 py-2 bg-red-500/20 text-red-400 border border-red-500/30 rounded-lg font-medium hover:bg-red-500/30 transition-all duration-200"
-          >
-            🗑️ Clear
-          </button>
-
-          <button
-            onClick={exportLogs}
-            className="px-4 py-2 bg-purple-500/20 text-purple-400 border border-purple-500/30 rounded-lg font-medium hover:bg-purple-500/30 transition-all duration-200"
-          >
-            📥 Export
-          </button>
-
-          <div className="text-sm text-gray-400">
-            {filteredLogs.length} / {logs.length} entries
+        {/* Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-6">
+          <div className="text-center">
+            <div className="text-2xl font-bold text-cyan-400">{logs.length}</div>
+            <div className="text-xs text-gray-400">Total Logs</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-red-400">{logs.filter(l => l.level === 'error').length}</div>
+            <div className="text-xs text-gray-400">Errors</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-yellow-400">{logs.filter(l => l.level === 'warning').length}</div>
+            <div className="text-xs text-gray-400">Warnings</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-purple-400">{logs.filter(l => l.level === 'consciousness').length}</div>
+            <div className="text-xs text-gray-400">Consciousness</div>
+          </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-green-400">{filteredLogs.length}</div>
+            <div className="text-xs text-gray-400">Filtered</div>
           </div>
         </div>
       </div>
 
-      {/* Logs Display */}
-      <div className="bg-gradient-to-br from-slate-900/50 to-slate-800/30 rounded-xl border border-cyan-500/20 backdrop-blur-sm">
-        <div className="h-96 overflow-y-auto p-4 space-y-2 font-mono text-sm">
-          {filteredLogs.map((log) => (
-            <div
-              key={log.id}
-              className="flex items-start space-x-3 p-3 bg-slate-800/30 rounded-lg hover:bg-slate-700/30 transition-colors"
-            >
-              <div className="text-xs text-gray-500 w-20 flex-shrink-0">
+      {/* Logs List */}
+      <div className="space-y-2 max-h-[600px] overflow-y-auto">
+        {filteredLogs.map((log) => (
+          <div
+            key={log.id}
+            className="bg-gradient-to-br from-slate-900/30 to-slate-800/20 rounded-lg p-4 border border-gray-700/50 backdrop-blur-sm hover:border-gray-600/50 transition-all duration-200"
+          >
+            <div className="flex items-start justify-between mb-2">
+              <div className="flex items-center space-x-3">
+                {getLevelIcon(log.level)}
+                <span className={`px-2 py-1 rounded-full text-xs font-medium border ${getLevelColor(log.level)}`}>
+                  {log.level.toUpperCase()}
+                </span>
+                <div className="flex items-center space-x-2">
+                  {getComponentIcon(log.component)}
+                  <span className="text-sm font-medium text-gray-300">{log.component}</span>
+                </div>
+              </div>
+              
+              <div className="text-xs text-gray-500 font-mono">
                 {new Date(log.timestamp).toLocaleTimeString()}
               </div>
+            </div>
 
-              <div className={`px-2 py-1 rounded text-xs font-medium border ${getLevelColor(log.level)} flex-shrink-0`}>
-                {log.level.toUpperCase()}
-              </div>
+            <div className="text-white mb-2">{log.message}</div>
 
-              <div
-                className={`px-2 py-1 rounded text-xs font-medium ${getComponentColor(log.component)} flex-shrink-0`}
-              >
-                {log.component}
-              </div>
-
-              <div className="flex-1 text-gray-300">
-                {log.message}
+            {log.consciousnessLevel && (
+              <div className="flex items-center space-x-4 text-xs text-gray-400">
+                <span>Consciousness: {log.consciousnessLevel.toFixed(1)}%</span>
+                <span>Recursion: {log.recursionDepth}</span>
                 {log.metadata && (
-                  <div className="mt-1 text-xs text-gray-500">
-                    {Object.entries(log.metadata).map(([key, value]) => (
-                      <span key={key} className="mr-3">
-                        {key}: {typeof value === "object" ? JSON.stringify(value) : value}
-                      </span>
-                    ))}
-                  </div>
+                  <>
+                    <span>Processing: {log.metadata.processingTime}ms</span>
+                    <span>Memory: {log.metadata.memoryUsage}MB</span>
+                  </>
                 )}
               </div>
+            )}
+          </div>
+        ))}
 
-              {log.recursionDepth && (
-                <div className="text-xs text-purple-400 flex-shrink-0">Depth: {log.recursionDepth}</div>
-              )}
-
-              {log.consciousnessLevel && (
-                <div className="text-xs text-cyan-400 flex-shrink-0">C: {log.consciousnessLevel.toFixed(1)}%</div>
-              )}
-            </div>
-          ))}
-          <div ref={logsEndRef} />
-        </div>
-      </div>
-
-      {/* Statistics */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        {levels.slice(1).map((level) => {
-          const count = logs.filter((log) => log.level === level).length
-          return (
-            <div key={level} className={`p-4 rounded-xl border ${getLevelColor(level)} backdrop-blur-sm`}>
-              <div className="text-2xl font-bold">{count}</div>
-              <div className="text-sm capitalize">{level}</div>
-            </div>
-          )
-        })}
+        {filteredLogs.length === 0 && (
+          <div className="text-center py-12">
+            <div className="text-gray-400 mb-2">No logs match your current filters</div>
+            <button
+              onClick={() => {
+                setSearchTerm("")
+                setSelectedLevel("all")
+                setSelectedComponent("all")
+              }}
+              className="text-cyan-400 hover:text-cyan-300 transition-colors"
+            >
+              Clear all filters
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )

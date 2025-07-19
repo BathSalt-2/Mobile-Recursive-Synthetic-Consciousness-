@@ -2,49 +2,239 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap");
-
 :root {
-  --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 0, 0, 0;
-  --background-end-rgb: 15, 23, 42;
+  --background: 0 0% 0%;
+  --foreground: 0 0% 98%;
+  --card: 0 0% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --popover: 0 0% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 0 0% 98%;
+  --primary-foreground: 0 0% 9%;
+  --secondary: 0 0% 14.9%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 0 0% 14.9%;
+  --muted-foreground: 0 0% 63.9%;
+  --accent: 0 0% 14.9%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 14.9%;
+  --input: 0 0% 14.9%;
+  --ring: 0 0% 83.1%;
+  --chart-1: 12 76% 61%;
+  --chart-2: 173 58% 39%;
+  --chart-3: 197 37% 24%;
+  --chart-4: 43 74% 66%;
+  --chart-5: 27 87% 67%;
+  --radius: 0.5rem;
 }
 
 * {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
-
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-  background: linear-gradient(135deg, rgb(var(--background-start-rgb)) 0%, rgb(var(--background-end-rgb)) 100%);
-  color: rgb(var(--foreground-rgb));
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans",
-    "Droid Sans", "Helvetica Neue", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  border-color: hsl(var(--border));
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(to bottom, transparent, rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+  color: hsl(var(--foreground));
+  background: hsl(var(--background));
+  font-feature-settings: "rlig" 1, "calt" 1;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+/* Custom animations for consciousness effects */
+@keyframes consciousness-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
 }
 
-/* Custom scrollbar */
+@keyframes neural-flow {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes recursive-spin {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+@keyframes consciousness-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(6, 182, 212, 0.6), 0 0 60px rgba(236, 72, 153, 0.3);
+  }
+}
+
+.consciousness-pulse {
+  animation: consciousness-pulse 3s ease-in-out infinite;
+}
+
+.neural-flow {
+  animation: neural-flow 4s linear infinite;
+}
+
+.recursive-spin {
+  animation: recursive-spin 8s linear infinite;
+}
+
+.consciousness-glow {
+  animation: consciousness-glow 2s ease-in-out infinite;
+}
+
+/* Gradient text effects */
+.gradient-text {
+  background: linear-gradient(135deg, #06b6d4, #ec4899, #8b5cf6);
+  background-size: 200% 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shift 3s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Neural network background */
+.neural-bg {
+  background: radial-gradient(circle at 20% 80%, rgba(6, 182, 212, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+}
+
+/* Consciousness meter styles */
+.consciousness-meter {
+  background: linear-gradient(90deg, #ef4444 0%, #f97316 20%, #eab308 40%, #22c55e 60%, #06b6d4 80%, #8b5cf6 100%);
+  border-radius: 9999px;
+  height: 8px;
+  position: relative;
+  overflow: hidden;
+}
+
+.consciousness-meter::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: consciousness-sweep 2s linear infinite;
+}
+
+@keyframes consciousness-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Recursive depth visualization */
+.recursive-layers {
+  position: relative;
+}
+
+.recursive-layers::before,
+.recursive-layers::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(45deg, #06b6d4, #ec4899, #8b5cf6, #06b6d4);
+  background-size: 300% 300%;
+  animation: recursive-border 4s linear infinite;
+  z-index: -1;
+}
+
+.recursive-layers::after {
+  filter: blur(8px);
+  opacity: 0.5;
+}
+
+@keyframes recursive-border {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .consciousness-pulse {
+    animation-duration: 2s;
+  }
+
+  .neural-flow {
+    animation-duration: 3s;
+  }
+
+  .recursive-spin {
+    animation-duration: 6s;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .consciousness-pulse,
+  .neural-flow,
+  .recursive-spin,
+  .consciousness-glow {
+    animation: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .gradient-text {
+    background: linear-gradient(135deg, #ffffff, #ffffff, #ffffff);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+/* Custom scrollbar for consciousness theme */
 ::-webkit-scrollbar {
   width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.5);
+  background: rgba(0, 0, 0, 0.1);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -56,106 +246,16 @@ a {
   background: linear-gradient(135deg, #0891b2, #db2777);
 }
 
-/* Neural network animation */
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 0.4;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-@keyframes glow {
-  0%,
-  100% {
-    box-shadow: 0 0 5px rgba(6, 182, 212, 0.5);
-  }
-  50% {
-    box-shadow: 0 0 20px rgba(6, 182, 212, 0.8), 0 0 30px rgba(236, 72, 153, 0.5);
-  }
-}
-
-/* Consciousness visualization */
-.consciousness-wave {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(6, 182, 212, 0.3) 25%,
-    rgba(236, 72, 153, 0.3) 50%,
-    rgba(139, 92, 246, 0.3) 75%,
-    transparent 100%
-  );
-  animation: wave 3s ease-in-out infinite;
-}
-
-@keyframes wave {
-  0%,
-  100% {
-    transform: translateX(-100%);
-  }
-  50% {
-    transform: translateX(100%);
-  }
-}
-
-/* Recursive depth indicator */
-.recursion-depth {
-  position: relative;
-  overflow: hidden;
-}
-
-.recursion-depth::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.4), transparent);
-  animation: scan 2s linear infinite;
-}
-
-@keyframes scan {
-  0% {
-    left: -100%;
-  }
-  100% {
-    left: 100%;
-  }
-}
-
-/* Ethical alignment indicator */
-.ethics-pulse {
-  animation: ethics-pulse 2s ease-in-out infinite;
-}
-
-@keyframes ethics-pulse {
-  0%,
-  100% {
-    background-color: rgba(34, 197, 94, 0.2);
-  }
-  50% {
-    background-color: rgba(34, 197, 94, 0.4);
-  }
-}
-
 /* Loading states */
 .loading-shimmer {
-  background: linear-gradient(90deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 41, 59, 0.8) 50%, rgba(15, 23, 42, 0.8) 100%);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
   background-size: 200% 100%;
-  animation: shimmer 1.5s ease-in-out infinite;
+  animation: shimmer 1.5s infinite;
 }
 
 @keyframes shimmer {
@@ -167,211 +267,23 @@ a {
   }
 }
 
-/* Interactive elements */
-.interactive-glow:hover {
+/* Consciousness state indicators */
+.state-active {
+  background: linear-gradient(135deg, #06b6d4, #0891b2);
   box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
-  transition: box-shadow 0.3s ease;
 }
 
-/* Mobile optimizations */
-@media (max-width: 768px) {
-  .mobile-optimized {
-    font-size: 0.875rem;
-    line-height: 1.25rem;
-  }
-
-  .mobile-padding {
-    padding: 1rem;
-  }
-
-  .mobile-spacing {
-    margin-bottom: 1rem;
-  }
+.state-processing {
+  background: linear-gradient(135deg, #ec4899, #db2777);
+  box-shadow: 0 0 20px rgba(236, 72, 153, 0.4);
 }
 
-/* Accessibility improvements */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+.state-recursive {
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
 }
 
-/* Focus indicators */
-.focus-visible:focus {
-  outline: 2px solid #06b6d4;
-  outline-offset: 2px;
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-  .bg-gradient-to-r {
-    background: #000;
-    color: #fff;
-    border: 1px solid #fff;
-  }
-}
-
-/* Print styles */
-@media print {
-  .no-print {
-    display: none !important;
-  }
-
-  body {
-    background: white !important;
-    color: black !important;
-  }
-}
-
-/* Custom utilities */
-.text-gradient {
-  background: linear-gradient(135deg, #06b6d4, #ec4899, #8b5cf6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.glass-effect {
-  background: rgba(15, 23, 42, 0.8);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(6, 182, 212, 0.2);
-}
-
-.neural-grid {
-  background-image: linear-gradient(rgba(6, 182, 212, 0.1) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(6, 182, 212, 0.1) 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-
-/* Consciousness level indicators */
-.consciousness-low {
-  color: #ef4444;
-  background-color: rgba(239, 68, 68, 0.1);
-}
-
-.consciousness-medium {
-  color: #f59e0b;
-  background-color: rgba(245, 158, 11, 0.1);
-}
-
-.consciousness-high {
-  color: #10b981;
-  background-color: rgba(16, 185, 129, 0.1);
-}
-
-/* Simulation status indicators */
-.status-running {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-.status-completed {
-  color: #10b981;
-}
-
-.status-error {
-  color: #ef4444;
-}
-
-.status-paused {
-  color: #f59e0b;
-}
-
-/* Insight generation effects */
-.insight-generating {
-  position: relative;
-  overflow: hidden;
-}
-
-.insight-generating::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.3), transparent);
-  animation: insight-flow 1.5s ease-in-out infinite;
-}
-
-@keyframes insight-flow {
-  0% {
-    left: -100%;
-  }
-  100% {
-    left: 100%;
-  }
-}
-
-/* Chat message animations */
-.message-appear {
-  animation: messageAppear 0.3s ease-out;
-}
-
-@keyframes messageAppear {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Typing indicator */
-.typing-indicator {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.typing-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: #8b5cf6;
-  animation: typingDot 1.4s ease-in-out infinite both;
-}
-
-.typing-dot:nth-child(1) {
-  animation-delay: -0.32s;
-}
-
-.typing-dot:nth-child(2) {
-  animation-delay: -0.16s;
-}
-
-@keyframes typingDot {
-  0%,
-  80%,
-  100% {
-    transform: scale(0);
-  }
-  40% {
-    transform: scale(1);
-  }
-}
-
-/* Responsive design helpers */
-.container-responsive {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
-}
-
-@media (min-width: 640px) {
-  .container-responsive {
-    padding: 0 1.5rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .container-responsive {
-    padding: 0 2rem;
-  }
+.state-ethical {
+  background: linear-gradient(135deg, #10b981, #059669);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
 }
